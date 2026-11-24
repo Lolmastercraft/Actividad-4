@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+.motor/
+.venv/
+__pycache__/
+.pytest_cache/
+*.py[cod]
+*.db*
+bitacora/*
+!bitacora/.gitkeep
+evidencias/

@@ -1,0 +1,8 @@
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-ra"
+markers = [
+    "motor_local: requiere la copia local verificada del motor del Avance 1",
+    "ruff_local: requiere la instalación de Ruff en el intérprete de pruebas",
+]

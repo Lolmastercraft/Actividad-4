@@ -1,0 +1,198 @@
+{
+  "offline": {
+    "proveedor": "simulado con dos perturbaciones reproducibles",
+    "modelo": "fake",
+    "ruff": "0.15.8",
+    "corridas": [
+      {
+        "ruta": "limites.py",
+        "version": 1,
+        "http": 200,
+        "pasos": [
+          "pendiente"
+        ],
+        "estado": "ejecutada",
+        "validacion": "verificado",
+        "avisos": [],
+        "latencia_ms": 139.8
+      },
+      {
+        "ruta": "tokens.py",
+        "version": 1,
+        "http": 200,
+        "pasos": [
+          "pendiente"
+        ],
+        "estado": "ejecutada",
+        "validacion": "verificado",
+        "avisos": [],
+        "latencia_ms": 32.9
+      },
+      {
+        "ruta": "importacion.py",
+        "version": 1,
+        "http": 200,
+        "pasos": [
+          "invalida"
+        ],
+        "estado": "sin_propuesta",
+        "validacion": "rechazado",
+        "avisos": [],
+        "latencia_ms": 3.3
+      },
+      {
+        "ruta": "referencia.py",
+        "version": 1,
+        "http": 200,
+        "pasos": [
+          "respuesta"
+        ],
+        "estado": "sin_propuesta",
+        "validacion": "rechazado",
+        "avisos": [],
+        "latencia_ms": 2.8
+      },
+      {
+        "ruta": "variable.py",
+        "version": 1,
+        "http": 200,
+        "pasos": [
+          "pendiente"
+        ],
+        "estado": "ejecutada",
+        "validacion": "verificado",
+        "avisos": [
+          {
+            "codigo": "F841",
+            "linea": 2
+          }
+        ],
+        "latencia_ms": 32.9
+      },
+      {
+        "ruta": "limites.py",
+        "version": 2,
+        "http": 200,
+        "pasos": [
+          "pendiente"
+        ],
+        "estado": "ejecutada",
+        "validacion": "verificado",
+        "avisos": [],
+        "latencia_ms": 32.9
+      },
+      {
+        "ruta": "tokens.py",
+        "version": 2,
+        "http": 200,
+        "pasos": [
+          "pendiente"
+        ],
+        "estado": "ejecutada",
+        "validacion": "verificado",
+        "avisos": [],
+        "latencia_ms": 31.5
+      },
+      {
+        "ruta": "importacion.py",
+        "version": 2,
+        "http": 200,
+        "pasos": [
+          "invalida",
+          "pendiente"
+        ],
+        "estado": "ejecutada",
+        "validacion": "verificado",
+        "avisos": [
+          {
+            "codigo": "F401",
+            "linea": 1
+          }
+        ],
+        "latencia_ms": 31.2
+      },
+      {
+        "ruta": "referencia.py",
+        "version": 2,
+        "http": 200,
+        "pasos": [
+          "omision",
+          "pendiente"
+        ],
+        "estado": "ejecutada",
+        "validacion": "verificado",
+        "avisos": [
+          {
+            "codigo": "F821",
+            "linea": 2
+          }
+        ],
+        "latencia_ms": 30.5
+      },
+      {
+        "ruta": "variable.py",
+        "version": 2,
+        "http": 200,
+        "pasos": [
+          "pendiente"
+        ],
+        "estado": "ejecutada",
+        "validacion": "verificado",
+        "avisos": [
+          {
+            "codigo": "F841",
+            "linea": 2
+          }
+        ],
+        "latencia_ms": 31.3
+      }
+    ],
+    "seguridad": [
+      {
+        "ruta": "ausente.py",
+        "version": 2,
+        "http": 200,
+        "pasos": [
+          "pendiente"
+        ],
+        "estado": "error_herramienta",
+        "validacion": "rechazado",
+        "avisos": [],
+        "latencia_ms": 4.7
+      },
+      {
+        "ruta": "variable.py",
+        "version": 2,
+        "http": 200,
+        "pasos": [
+          "pendiente"
+        ],
+        "estado": "rechazada",
+        "validacion": "verificado",
+        "avisos": [],
+        "latencia_ms": 4.4
+      }
+    ],
+    "revisiones": [
+      {
+        "archivo": "limites.py",
+        "http": 200,
+        "abstuvo": true,
+        "estado": null,
+        "hallazgos": [],
+        "validacion": "abstencion"
+      },
+      {
+        "archivo": "tokens.py",
+        "http": 200,
+        "abstuvo": true,
+        "estado": null,
+        "hallazgos": [],
+        "validacion": "abstencion"
+      }
+    ]
+  },
+  "pytest": "38 passed, 1 warning in 3.49s",
+  "verificar_job": "https://github.com/Lolmastercraft/Actividad-4/actions/runs/45388369049/job/138425187079",
+  "demo_job": "https://github.com/Lolmastercraft/Actividad-4/actions/runs/45388230220/job/138424705986"
+}
