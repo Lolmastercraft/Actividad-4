@@ -122,8 +122,9 @@ def detalle_validacion(error: RequestValidationError) -> str:
     for problema_entrada in error.errors():
         ubicacion = problema_entrada["loc"]
         clave = ubicacion[1] if len(ubicacion) > 1 else "cuerpo"
-        campo = clave if clave in ("codigo", "email", "contrasena", "tarea", "ruta", "archivo", "aprobar", "version") else "cuerpo"
         tipo = problema_entrada["type"]
+        campos = ("codigo", "email", "contrasena", "tarea", "ruta", "archivo", "aprobar", "version")
+        campo = clave if clave in campos and tipo != "extra_forbidden" else "cuerpo"
         mensaje = reglas.get(tipo, "formato inválido")
         if tipo == "codigo_sintaxis":
             mensaje = f"sintaxis Python inválida en la línea {problema_entrada['ctx']['linea']}"
