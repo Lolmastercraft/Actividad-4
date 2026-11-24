@@ -2,6 +2,10 @@
 
 Luis Alfonso Juárez Amaro · LSCA2318 · Variante `v2-revisor`
 
+[Etiqueta a4-lolmastercraft](https://github.com/Lolmastercraft/Actividad-4/tree/a4-lolmastercraft) ·
+[Informe PDF](https://github.com/Lolmastercraft/Actividad-4/releases/download/a4-lolmastercraft/Actividad_4_Informe.pdf) ·
+[Demo de 2 minutos](https://github.com/Lolmastercraft/Actividad-4/releases/download/a4-lolmastercraft/Actividad_4_Demo.mp4)
+
 La interfaz usa la autenticación heredada de la A3 para llamar a `POST /v1/v2-revisor`
 y al agente de la A4. El agente propone un análisis estático de un archivo del catálogo.
 La persona ve la operación y los argumentos antes de aceptar o rechazar.
@@ -59,3 +63,5 @@ La medición con `--gemini` requiere la clave en el entorno y se guarda en otro 
 Cada medición conserva los estados, tiempos, decisión de validación y diagnósticos
 de las cinco entradas, además de los dos escenarios de seguridad. El workflow de
 GitHub guarda la demo de 120 s y la evidencia de sus pasos.
+
+La salida de la evaluación controlada quedó en [docs/resultados_a4.json](docs/resultados_a4.json).
