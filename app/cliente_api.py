@@ -128,11 +128,14 @@ if modo == "Mi variante":
             muestra = st.session_state.get("muestra", {})
             codigo = muestra.get("codigo", "") if muestra.get("archivo") == archivo else ""
             st.code(codigo, language="python", line_numbers=True, height=216)
-        if st.button("Revisar código", type="primary", disabled=not codigo.strip()):
-            ruta_revision = "/v1/v2-revisor" if archivo == "Código propio" else f"/v1/v2-revisor?archivo={archivo}"
-            revision = cargar(
-                lambda: llamar("POST", ruta_revision, {"codigo": codigo}), "Revisando código y verificando citas")
-            st.session_state["revision"] = (archivo, revision) if revision else None
+        if st.button("Revisar código", type="primary"):
+            if codigo.strip():
+                ruta_revision = "/v1/v2-revisor" if archivo == "Código propio" else f"/v1/v2-revisor?archivo={archivo}"
+                revision = cargar(
+                    lambda: llamar("POST", ruta_revision, {"codigo": codigo}), "Revisando código y verificando citas")
+                st.session_state["revision"] = (archivo, revision) if revision else None
+            else:
+                st.warning("Escribe el código o selecciona un archivo del catálogo.")
     with panel:
         st.subheader("Dictamen")
         guardada = st.session_state.get("revision")

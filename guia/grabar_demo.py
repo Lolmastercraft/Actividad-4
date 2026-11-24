@@ -45,7 +45,13 @@ def capturas(pagina, directo: Path, cuenta: dict):
     pagina.get_by_label("Contraseña", exact=True).fill(cuenta["contrasena"])
     pagina.get_by_role("button", name="Entrar", exact=True).click()
     expect(pagina.get_by_text("Dictamen", exact=True)).to_be_visible()
-    pagina.get_by_label("Pega el código").fill("from decimal import Decimal\nimporte = Decimal('25.00')")
+
+    def seleccionar(archivo):
+        pagina.get_by_role("combobox").click()
+        pagina.get_by_role("option", name=archivo, exact=True).click()
+
+    seleccionar("limites.py")
+    expect(pagina.locator("[data-testid='stCode']")).to_be_visible()
     pagina.get_by_role("button", name="Revisar código").click()
     expect(pagina.get_by_text("Validador local", exact=False).first).to_be_visible(timeout=180_000)
     tomar("02 · Revisión autenticada", "Mi variante consume el endpoint de la A3. El panel muestra el estado del validador y las fuentes disponibles.", 16)
@@ -53,8 +59,7 @@ def capturas(pagina, directo: Path, cuenta: dict):
     expect(pagina.get_by_text("Análisis estático", exact=True)).to_be_visible()
 
     def elegir(archivo):
-        pagina.get_by_role("combobox").click()
-        pagina.get_by_role("option", name=archivo, exact=True).click()
+        seleccionar(archivo)
         pagina.get_by_role("button", name="Solicitar análisis", exact=True).click()
         expect(pagina.get_by_text("Acción pendiente de autorización", exact=True)).to_be_visible(timeout=180_000)
 
