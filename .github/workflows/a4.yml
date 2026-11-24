@@ -1,0 +1,145 @@
+name: Actividad 4 · Verificación y demo
+
+on:
+  push:
+    branches: [actividad-4-lolmastercraft]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      LLM_PROVIDER: fake
+      EMB_PROVIDER: hash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Instalar dependencias
+        run: python -m pip install -r requirements.txt
+      - name: Verificar revisión fijada del motor
+        run: python -m guia.preparar_motor --descargar
+      - name: Probar autenticación, revisión y agente
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p evidencias
+          python -m pytest -q | tee evidencias/pytest.txt
+      - name: Medir dos versiones con los mismos casos
+        run: python -m guia.evaluar_a4 evidencias/medicion
+      - uses: actions/upload-artifact@v4
+        with:
+          name: evaluacion-actividad-4
+          path: evidencias/
+          if-no-files-found: error
+
+  demo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      LLM_PROVIDER: fake
+      EMB_PROVIDER: hash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Instalar interfaz y navegador
+        run: |
+          python -m pip install -r requirements.txt playwright
+          python -m playwright install --with-deps chromium
+          command -v ffmpeg || (sudo apt-get update && sudo apt-get install -y ffmpeg)
+      - name: Preparar revisión fijada
+        run: python -m guia.preparar_motor --descargar
+      - name: Recorrer la interfaz y grabar evidencia
+        run: |
+          python -m guia.grabar_demo evidencias/demo
+          ffprobe -v error -show_entries format=duration,size -of json evidencias/demo/Actividad_4_Demo.mp4
+      - name: Mostrar diagnóstico de la integración
+        if: failure()
+        run: test ! -f evidencias/demo/servicios.log || tail -80 evidencias/demo/servicios.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: demo-actividad-4
+          path: |
+            evidencias/demo/Actividad_4_Demo.mp4
+            evidencias/demo/pantalla-*.png
+            evidencias/demo/trazas_demo.jsonl
+          if-no-files-found: warn
+
+  gemini:
+    name: Gemini real, si está habilitado
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Revisar si el proveedor está configurado
+        id: proveedor
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          if [ -n "$GEMINI_API_KEY" ]; then
+            echo 'activo=si' >> "$GITHUB_OUTPUT"
+          else
+            echo 'activo=no' >> "$GITHUB_OUTPUT"
+            echo 'GEMINI_API_KEY todavía no está configurada en este repositorio.'
+          fi
+      - uses: actions/checkout@v4
+        if: steps.proveedor.outputs.activo == 'si'
+      - uses: actions/setup-python@v5
+        if: steps.proveedor.outputs.activo == 'si'
+        with:
+          python-version: '3.12'
+      - name: Preparar dependencias y motor
+        if: steps.proveedor.outputs.activo == 'si'
+        run: |
+          python -m pip install -r requirements.txt
+          python -m guia.preparar_motor --descargar
+      - name: Ejecutar los casos con Gemini
+        if: steps.proveedor.outputs.activo == 'si'
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          LLM_MODEL: gemini-3.1-flash-lite
+          LLM_TIMEOUT: 30
+          LLM_RETRIES: 2
+        run: python -m guia.evaluar_a4 --gemini evidencias/gemini
+      - uses: actions/upload-artifact@v4
+        if: steps.proveedor.outputs.activo == 'si'
+        with:
+          name: gemini-actividad-4
+          path: evidencias/gemini/
+          if-no-files-found: error
+
+  publicar:
+    needs: [verificar, demo]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Identificar una entrega completa
+        id: entrega
+        run: |
+          if [ -f docs/Actividad_4_Informe.pdf ]; then
+            echo 'lista=si' >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/download-artifact@v4
+        if: steps.entrega.outputs.lista == 'si'
+        with:
+          name: demo-actividad-4
+          path: salida
+      - name: Publicar etiqueta, informe y demo
+        if: steps.entrega.outputs.lista == 'si'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view a4-lolmastercraft > /dev/null 2>&1; then
+            test "$(git ls-remote origin refs/tags/a4-lolmastercraft | cut -f1)" = "$GITHUB_SHA"
+          else
+            gh release create a4-lolmastercraft --target "$GITHUB_SHA" --title "Actividad 4 · Revisor FinNorte" --notes "Informe y demostración de la Actividad 4 de LSCA2318." docs/Actividad_4_Informe.pdf salida/Actividad_4_Demo.mp4
+          fi
