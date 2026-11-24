@@ -62,7 +62,6 @@ class Credenciales(BaseModel):
 class EntradaRevisor(BaseModel):
     model_config = ConfigDict(extra="forbid")
     codigo: Annotated[str, StringConstraints(strict=True, min_length=1, max_length=30_000)]
-    archivo: ArchivoCatalogo | None = None
 
     @field_validator("codigo")
     @classmethod
@@ -193,10 +192,10 @@ def crear_app(ruta_db: str | None = None, maximo: int | None = None, *,
 
     @servicio.post("/v1/v2-revisor")
     def ejecutar_revisor(entrada: EntradaRevisor, request: Request,
-                         _usuario: Annotated[str, Depends(usuario_actual)]):
+                         _usuario: Annotated[str, Depends(usuario_actual)], archivo: ArchivoCatalogo | None = None):
         try:
-            if entrada.archivo is not None:
-                original = herramientas.leer_caso(entrada.archivo).decode("utf-8")
+            if archivo is not None:
+                original = herramientas.leer_caso(archivo).decode("utf-8")
                 if original.splitlines() != entrada.codigo.splitlines():
                     raise ErrorServicio(422, "El contenido no coincide con el archivo del catálogo.")
             salida = motor.revisar(entrada.codigo)
@@ -205,8 +204,8 @@ def crear_app(ruta_db: str | None = None, maximo: int | None = None, *,
                 return salida
             variante, _ = motor.cargar_motor()
             fragmentos = {f.id for f in variante.indice().fragmentos}
-            revision = validador.validar_revision(salida, entrada.codigo, entrada.archivo, fragmentos)
-            request.app.state.agente.registrar(tipo="revision", archivo=entrada.archivo, validacion=revision["estado"])
+            revision = validador.validar_revision(salida, entrada.codigo, archivo, fragmentos)
+            request.app.state.agente.registrar(tipo="revision", archivo=archivo, validacion=revision["estado"])
             if not revision["ok"]:
                 salida = {**salida, "abstuvo": True, "artefacto": {}, "fuentes": [], "errores_citas": [],
                           "respuesta": "No pude verificar el dictamen. Se requiere revisión humana."}

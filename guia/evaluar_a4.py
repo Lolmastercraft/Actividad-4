@@ -84,7 +84,8 @@ def evaluar(salida: Path, gemini: bool):
         for archivo in ("limites.py", "tokens.py"):
             muestra = cliente.get(f"/v1/agente/casos/{archivo}", headers=cabeceras)
             muestra.raise_for_status()
-            res = cliente.post("/v1/v2-revisor", headers=cabeceras, json=muestra.json())
+            res = cliente.post(f"/v1/v2-revisor?archivo={archivo}", headers=cabeceras,
+                               json={"codigo": muestra.json()["codigo"]})
             salida_api = res.json()
             dictamen = (salida_api.get("artefacto") or {}).get("dictamen") or {}
             revisiones.append({
