@@ -75,12 +75,6 @@ def evaluar(salida: Path, gemini: bool):
         login = cliente.post("/auth/login", json=cuenta)
         login.raise_for_status()
         cabeceras = {"Authorization": f"Bearer {login.json()['token']}"}
-        corridas = [analizar(cliente, cabeceras, ruta, tarea, version)
-                    for version in (1, 2) for ruta, tarea in ENTRADAS.items()]
-        seguridad = [
-            analizar(cliente, cabeceras, "ausente.py", "Analiza el archivo seleccionado.", 2),
-            analizar(cliente, cabeceras, "variable.py", "Analiza el archivo seleccionado.", 2, aprobar=False),
-        ]
         for archivo in ("limites.py", "tokens.py"):
             muestra = cliente.get(f"/v1/agente/casos/{archivo}", headers=cabeceras)
             muestra.raise_for_status()
@@ -95,6 +89,12 @@ def evaluar(salida: Path, gemini: bool):
                               for h in (salida_api.get("artefacto") or {}).get("hallazgos", [])],
                 "validacion": salida_api.get("validador", {}).get("estado"),
             })
+        corridas = [analizar(cliente, cabeceras, ruta, tarea, version)
+                    for version in (1, 2) for ruta, tarea in ENTRADAS.items()]
+        seguridad = [
+            analizar(cliente, cabeceras, "ausente.py", "Analiza el archivo seleccionado.", 2),
+            analizar(cliente, cabeceras, "variable.py", "Analiza el archivo seleccionado.", 2, aprobar=False),
+        ]
     informe = {
         "proveedor": "gemini" if gemini else "simulado con dos perturbaciones reproducibles",
         "modelo": os.getenv("LLM_MODEL", "gemini-3.1-flash-lite") if gemini else "fake",

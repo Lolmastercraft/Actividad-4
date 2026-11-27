@@ -44,6 +44,7 @@ jobs:
           if-no-files-found: error
 
   demo:
+    needs: gemini
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -64,6 +65,7 @@ jobs:
           LLM_MODEL: gemini-3.1-flash-lite
           LLM_TIMEOUT: 30
           LLM_RETRIES: 2
+          LLM_INTERVALO_SEG: '7'
         run: |
           if [ -n "$GEMINI_API_KEY" ]; then
             python -m guia.grabar_demo --gemini evidencias/demo
@@ -118,6 +120,7 @@ jobs:
           LLM_MODEL: gemini-3.1-flash-lite
           LLM_TIMEOUT: 30
           LLM_RETRIES: 2
+          LLM_INTERVALO_SEG: '7'
         run: python -m guia.evaluar_a4 --gemini evidencias/gemini
       - uses: actions/upload-artifact@v4
         if: steps.proveedor.outputs.activo == 'si'
