@@ -2,9 +2,8 @@
 
 Luis Alfonso Juárez Amaro · LSCA2318 · Variante `v2-revisor`
 
-[Etiqueta a4-lolmastercraft](https://github.com/Lolmastercraft/Actividad-4/tree/a4-lolmastercraft) ·
-[Informe PDF](https://github.com/Lolmastercraft/Actividad-4/releases/download/a4-lolmastercraft/Actividad_4_Informe.pdf) ·
-[Demo de 2 minutos](https://github.com/Lolmastercraft/Actividad-4/releases/download/a4-lolmastercraft/Actividad_4_Demo.mp4)
+[Revisión a4-lolmastercraft-r2](https://github.com/Lolmastercraft/Actividad-4/releases/tag/a4-lolmastercraft-r2) ·
+[Informe PDF](https://github.com/Lolmastercraft/Actividad-4/releases/download/a4-lolmastercraft-r2/Actividad_4_Informe.pdf)
 
 La interfaz usa la autenticación heredada de la A3 para llamar a `POST /v1/v2-revisor`
 y al agente de la A4. El agente propone un análisis estático de un archivo del catálogo.
@@ -62,15 +61,16 @@ La medición local inyecta dos respuestas controladas del proveedor y corre Ruff
 La medición con `--gemini` requiere la clave en el entorno y se guarda en otro directorio.
 Cada medición conserva los estados, tiempos, decisión de validación y diagnósticos
 de las cinco entradas, además de los dos escenarios de seguridad. El workflow de
-GitHub guarda la demo de 120 s y la evidencia de sus pasos.
+GitHub guarda capturas y trazas de la interfaz.
 
-La salida de la evaluación controlada quedó en [docs/resultados_a4.json](docs/resultados_a4.json).
+Los resultados de la prueba controlada están en
+[docs/resultados_a4.json](docs/resultados_a4.json). La revisión con Gemini está
+documentada en el informe de r2.
 
 En GitHub Actions, el secreto `GEMINI_API_KEY` habilita una evaluación separada y
 una captura de `tokens.py` que exige un dictamen verificado y al menos una fuente
 visible. La demo de prueba local muestra explícitamente la abstención.
 
-Para publicar una revisión con el informe y la demo actualizados, ejecuta el
-workflow sobre la rama de trabajo con el campo `etiqueta_revision`, por ejemplo
-`a4-lolmastercraft-r2`. Los pushes normales siguen verificándose y la entrega
-original conserva su etiqueta y sus archivos.
+El flujo usa `ETIQUETA_INFORME` para identificar la revisión del PDF. Cuando
+solo cambia la documentación, puede reutilizar la corrida verificada de la misma
+implementación.
