@@ -2,13 +2,16 @@
 import importlib
 import hashlib
 import json
+import logging
 import os
+import re
 import sys
 from functools import lru_cache
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parents[1]
 REVISION = "6c1835b1a556240382c3d678ecec6bf0af6f5948"
+LOG = logging.getLogger(__name__)
 
 
 class MotorNoDisponible(RuntimeError):
@@ -50,4 +53,6 @@ def revisar(codigo: str) -> dict:
     try:
         return variante.sistema({"codigo": codigo})
     except proveedor.LLMError as exc:
+        estado = re.match(r"HTTP ([0-9]{3}):", str(exc))
+        LOG.warning("Fallo del proveedor de revisión (%s)", f"HTTP {estado[1]}" if estado else "respuesta no utilizable")
         raise MotorNoDisponible("Proveedor no disponible") from exc

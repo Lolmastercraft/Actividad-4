@@ -4,6 +4,11 @@ on:
   push:
     branches: [actividad-4-lolmastercraft]
   workflow_dispatch:
+    inputs:
+      etiqueta_revision:
+        description: Etiqueta de una revisión completa (por ejemplo, a4-lolmastercraft-r2)
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -39,11 +44,9 @@ jobs:
           if-no-files-found: error
 
   demo:
+    needs: gemini
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    env:
-      LLM_PROVIDER: fake
-      EMB_PROVIDER: hash
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -57,8 +60,18 @@ jobs:
       - name: Preparar revisión fijada
         run: python -m guia.preparar_motor --descargar
       - name: Recorrer la interfaz y grabar evidencia
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          LLM_MODEL: gemini-3.1-flash-lite
+          LLM_TIMEOUT: 30
+          LLM_RETRIES: 2
+          LLM_INTERVALO_SEG: '7'
         run: |
-          python -m guia.grabar_demo evidencias/demo
+          if [ -n "$GEMINI_API_KEY" ]; then
+            python -m guia.grabar_demo --gemini evidencias/demo
+          else
+            python -m guia.grabar_demo evidencias/demo
+          fi
           ffprobe -v error -show_entries format=duration,size -of json evidencias/demo/Actividad_4_Demo.mp4
       - name: Mostrar diagnóstico de la integración
         if: failure()
@@ -107,6 +120,7 @@ jobs:
           LLM_MODEL: gemini-3.1-flash-lite
           LLM_TIMEOUT: 30
           LLM_RETRIES: 2
+          LLM_INTERVALO_SEG: '7'
         run: python -m guia.evaluar_a4 --gemini evidencias/gemini
       - uses: actions/upload-artifact@v4
         if: steps.proveedor.outputs.activo == 'si'
@@ -120,14 +134,37 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      ENTREGA_TAG: ${{ inputs.etiqueta_revision || 'a4-lolmastercraft' }}
     steps:
       - uses: actions/checkout@v4
       - name: Identificar una entrega completa
         id: entrega
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          if [ -f docs/Actividad_4_Informe.pdf ]; then
-            echo 'lista=si' >> "$GITHUB_OUTPUT"
+          if [[ ! -f docs/Actividad_4_Informe.pdf ]]; then
+            exit 0
           fi
+          if [[ ! "$ENTREGA_TAG" =~ ^a4-lolmastercraft(-r[0-9]+)?$ ]]; then
+            echo '::error::La etiqueta de revisión no sigue el formato esperado.'
+            exit 1
+          fi
+          publicado="$(git ls-remote --tags origin "refs/tags/$ENTREGA_TAG" | cut -f1)"
+          if [[ -n "$publicado" && "$publicado" != "$GITHUB_SHA" ]]; then
+            if [[ "$ENTREGA_TAG" == 'a4-lolmastercraft' ]]; then
+              echo 'La entrega original queda disponible. Usa una etiqueta de revisión nueva para publicar otro commit.'
+              exit 0
+            fi
+            echo '::error::La etiqueta de revisión ya apunta a otro commit.'
+            exit 1
+          fi
+          if gh release view "$ENTREGA_TAG" > /dev/null 2>&1; then
+            echo "La publicación $ENTREGA_TAG ya está disponible."
+            exit 0
+          fi
+          echo 'lista=si' >> "$GITHUB_OUTPUT"
       - uses: actions/download-artifact@v4
         if: steps.entrega.outputs.lista == 'si'
         with:
@@ -138,8 +175,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh release view a4-lolmastercraft > /dev/null 2>&1; then
-            test "$(git ls-remote origin refs/tags/a4-lolmastercraft | cut -f1)" = "$GITHUB_SHA"
-          else
-            gh release create a4-lolmastercraft --target "$GITHUB_SHA" --title "Actividad 4 · Revisor FinNorte" --notes "Informe y demostración de la Actividad 4 de LSCA2318." docs/Actividad_4_Informe.pdf salida/Actividad_4_Demo.mp4
-          fi
+          gh release create "$ENTREGA_TAG" --target "$GITHUB_SHA" --title "Actividad 4 · Revisor FinNorte" --notes "Informe y demostración de la Actividad 4 de LSCA2318." docs/Actividad_4_Informe.pdf salida/Actividad_4_Demo.mp4
