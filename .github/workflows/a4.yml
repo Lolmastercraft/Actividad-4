@@ -79,9 +79,8 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: demo-actividad-4
+          name: evidencia-interfaz-actividad-4
           path: |
-            evidencias/demo/Actividad_4_Demo.mp4
             evidencias/demo/pantalla-*.png
             evidencias/demo/trazas_demo.jsonl
           if-no-files-found: warn
@@ -165,14 +164,9 @@ jobs:
             exit 0
           fi
           echo 'lista=si' >> "$GITHUB_OUTPUT"
-      - uses: actions/download-artifact@v4
-        if: steps.entrega.outputs.lista == 'si'
-        with:
-          name: demo-actividad-4
-          path: salida
-      - name: Publicar etiqueta, informe y demo
+      - name: Publicar etiqueta e informe
         if: steps.entrega.outputs.lista == 'si'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$ENTREGA_TAG" --target "$GITHUB_SHA" --title "Actividad 4 · Revisor FinNorte" --notes "Informe y demostración de la Actividad 4 de LSCA2318." docs/Actividad_4_Informe.pdf salida/Actividad_4_Demo.mp4
+          gh release create "$ENTREGA_TAG" --target "$GITHUB_SHA" --title "Actividad 4 · Revisor FinNorte" --notes "Informe de la Actividad 4 de LSCA2318." docs/Actividad_4_Informe.pdf
