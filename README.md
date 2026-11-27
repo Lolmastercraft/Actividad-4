@@ -3,8 +3,7 @@
 Luis Alfonso Juárez Amaro · LSCA2318 · Variante `v2-revisor`
 
 [Etiqueta a4-lolmastercraft](https://github.com/Lolmastercraft/Actividad-4/tree/a4-lolmastercraft) ·
-[Informe PDF](https://github.com/Lolmastercraft/Actividad-4/releases/download/a4-lolmastercraft/Actividad_4_Informe.pdf) ·
-[Demo de 2 minutos](https://github.com/Lolmastercraft/Actividad-4/releases/download/a4-lolmastercraft/Actividad_4_Demo.mp4)
+[Informe PDF](https://github.com/Lolmastercraft/Actividad-4/releases/download/a4-lolmastercraft/Actividad_4_Informe.pdf)
 
 La interfaz usa la autenticación heredada de la A3 para llamar a `POST /v1/v2-revisor`
 y al agente de la A4. El agente propone un análisis estático de un archivo del catálogo.
