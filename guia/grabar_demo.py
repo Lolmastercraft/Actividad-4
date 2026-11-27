@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import re
 import secrets
 import subprocess
 import sys
@@ -30,7 +31,7 @@ def esperar(url):
     raise RuntimeError(f"No respondió el servicio local {url}")
 
 
-def capturas(pagina, directo: Path, cuenta: dict):
+def capturas(pagina, directo: Path, cuenta: dict, gemini: bool):
     fichas = []
 
     def tomar(titulo, texto, segundos):
@@ -50,11 +51,17 @@ def capturas(pagina, directo: Path, cuenta: dict):
         pagina.get_by_role("combobox").click()
         pagina.get_by_role("option", name=archivo, exact=True).click()
 
-    seleccionar("limites.py")
+    seleccionar("tokens.py" if gemini else "limites.py")
     expect(pagina.locator("[data-testid='stCode']")).to_be_visible()
     pagina.get_by_role("button", name="Revisar código").click()
     expect(pagina.get_by_text("Validador local", exact=False).first).to_be_visible(timeout=180_000)
-    tomar("02 · Revisión autenticada", "Mi variante consume el endpoint de la A3. El panel muestra el estado del validador y las fuentes disponibles.", 16)
+    if gemini:
+        expect(pagina.get_by_text("Validador local · verificado", exact=True)).to_be_visible()
+        expect(pagina.get_by_text(re.compile(r"sec-(?:0[1-9]|10)#[0-9]+")).first).to_be_visible()
+        texto = "Gemini revisó tokens.py. El validador local comprobó las líneas y las citas que muestra el panel."
+    else:
+        texto = "El proveedor simulado se abstuvo. La interfaz muestra el estado de revisión humana."
+    tomar("02 · Revisión autenticada", texto, 16)
     pagina.get_by_text("Agente", exact=True).click()
     expect(pagina.get_by_text("Análisis estático", exact=True)).to_be_visible()
 
@@ -112,12 +119,15 @@ def video(directorio: Path, fichas):
                     "-movflags", "+faststart", "Actividad_4_Demo.mp4"], check=True, cwd=directorio)
 
 
-def grabar(directorio: Path):
+def grabar(directorio: Path, gemini: bool):
+    if gemini and not os.getenv("GEMINI_API_KEY"):
+        raise RuntimeError("Configura GEMINI_API_KEY para grabar con Gemini.")
     directorio = directorio.resolve()
     directorio.mkdir(parents=True, exist_ok=True)
     entorno = {**os.environ, "TOKEN_SECRET": secrets.token_hex(32),
                "AUTH_DB": str(directorio / "demo.db"), "A4_TRAZAS": str(directorio / "trazas_demo.jsonl"),
-               "API_LIMITE": "90"}
+               "API_LIMITE": "90", "LLM_PROVIDER": "gemini" if gemini else "fake",
+               "EMB_PROVIDER": "gemini" if gemini else "hash"}
     cuenta = {"email": "demo-a4@example.com", "contrasena": secrets.token_urlsafe(20)}
     comandos = [
         [sys.executable, "-m", "uvicorn", "api.producto:app", "--host", "127.0.0.1", "--port", "8000"],
@@ -135,7 +145,7 @@ def grabar(directorio: Path):
                 navegador = playwright.chromium.launch()
                 try:
                     pagina = navegador.new_page(viewport={"width": 1440, "height": 900})
-                    fichas = capturas(pagina, directorio, cuenta)
+                    fichas = capturas(pagina, directorio, cuenta, gemini)
                 finally:
                     navegador.close()
             video(directorio, fichas)
@@ -149,4 +159,6 @@ def grabar(directorio: Path):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("directorio", type=Path)
-    grabar(parser.parse_args().directorio)
+    parser.add_argument("--gemini", action="store_true")
+    args = parser.parse_args()
+    grabar(args.directorio, args.gemini)

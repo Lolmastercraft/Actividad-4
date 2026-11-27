@@ -32,5 +32,30 @@ una ruta distinta y una respuesta prematura para reproducir dos fallas concretas
 El análisis estático y las decisiones de la API se ejecutan realmente en esas
 pruebas. La corrida opcional con Gemini guarda sus propios resultados.
 
+## Intercambio literal de la Actividad 4
+
+**24 de noviembre de 2026 · ChatGPT.** Encargo de implementación y revisión de la primera entrega.
+
+**Mi mensaje**
+
+```text
+[https://github.com/Lolmastercraft/Actividad-4.git](https://github.com/Lolmastercraft/Actividad-4.git)
+bueno aqui esta lo que seria el github que usaremos para la actividad 4 para que lo vayas haciendo ok
+```
+
+**Respuesta**
+
+> Luis, ya publiqué la **Actividad 4** en GitHub con la interfaz de Streamlit, el análisis con Ruff, la confirmación humana y el validador de reglas SEC.
+>
+> - [Etiqueta de entrega `a4-lolmastercraft`](https://github.com/Lolmastercraft/Actividad-4/releases/tag/a4-lolmastercraft)
+> - [Informe PDF de 6 páginas](https://github.com/Lolmastercraft/Actividad-4/releases/download/a4-lolmastercraft/Actividad_4_Informe.pdf)
+> - [Demo de 2 minutos](https://github.com/Lolmastercraft/Actividad-4/releases/download/a4-lolmastercraft/Actividad_4_Demo.mp4)
+>
+> Pasaron **38 pruebas**. En la evaluación controlada con Ruff real, la primera versión completó **3 de 5** análisis y la segunda completó **5 de 5**. También verifiqué el rechazo de una confirmación y el manejo de un archivo ausente.
+>
+> La prueba con **Gemini real** quedó pendiente porque el repositorio nuevo todavía no tiene configurado el secreto `GEMINI_API_KEY`.
+
+**Mi decisión.** Conservé el flujo y la prueba controlada como evidencia de recuperación ante fallas. Consideré incompleta la evidencia del modo «Mi variante». Pedí una corrida con Gemini que compruebe el dictamen y las fuentes en pantalla antes de atribuirle esas conclusiones a una revisión real.
+
 ---
 

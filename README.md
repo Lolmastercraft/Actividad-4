@@ -65,3 +65,12 @@ de las cinco entradas, además de los dos escenarios de seguridad. El workflow d
 GitHub guarda la demo de 120 s y la evidencia de sus pasos.
 
 La salida de la evaluación controlada quedó en [docs/resultados_a4.json](docs/resultados_a4.json).
+
+En GitHub Actions, el secreto `GEMINI_API_KEY` habilita una evaluación separada y
+una captura de `tokens.py` que exige un dictamen verificado y al menos una fuente
+visible. La demo de prueba local muestra explícitamente la abstención.
+
+Para publicar una revisión con el informe y la demo actualizados, ejecuta el
+workflow sobre la rama de trabajo con el campo `etiqueta_revision`, por ejemplo
+`a4-lolmastercraft-r2`. Los pushes normales siguen verificándose y la entrega
+original conserva su etiqueta y sus archivos.
